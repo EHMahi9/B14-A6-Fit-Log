@@ -61,7 +61,7 @@
 
 ### 5. ⚡ Tabbed Plan Management with Real-Time Actions
 - Seamless tab switching between **Today's Plan** and **Saved** workouts.
-- **C1 Challenge — Multi-Criteria Sort**: "Sort By" dropdown re-orders current lifts by **Duration**, **Calories**, or **Rating** with a single click.
+- **C1 Challenge — Multi-Criteria Sort (Ascending & Descending)**: "Sort By" control re-orders current lifts by **Duration**, **Calories**, or **Rating**, with a dedicated **Ascending / Descending (High → Low & Low → High)** toggle button and dropdown selectors.
 - **C3 Challenge — Mark as Done**: Interactive toggle with check icon strikes through completed exercises and triggers motivational toasts.
 - **C3 Challenge — Remove (X)**: Easily discard workouts from the plan or saved list with live metric recalculation.
 - **Empty State**: Displays custom gym illustration, "NOTHING HERE YET" messaging, and an immediate CTA button linking back to the library.

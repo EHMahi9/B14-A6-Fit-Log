@@ -20,3 +20,4 @@ export interface PlannedWorkout extends Workout {
 }
 
 export type SortOption = "Duration" | "Calories" | "Rating";
+export type SortDirection = "asc" | "desc";
