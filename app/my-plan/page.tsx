@@ -446,7 +446,16 @@ function PlanContent() {
 
                 {/* Right Side: Action Buttons */}
                 <div className="flex items-center justify-end gap-2.5 pt-3 md:pt-0 border-t md:border-t-0 border-[#20242e] shrink-0">
-                  {/* Mark as Done button (Challenge C3 - for plan items) */}
+                  {/* View Details button (Left side) */}
+                  <Link
+                    href={`/workout/${item.id}`}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#151921] border border-[#374151] text-xs font-bold text-gray-200 uppercase tracking-wider hover:text-white hover:border-gray-400 transition-colors"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-gray-400" />
+                    <span>View Details</span>
+                  </Link>
+
+                  {/* Mark as Done button (Right side, Challenge C3 - for plan items) */}
                   {activeTab === "plan" && (
                     <button
                       onClick={() => markAsDone(item.id)}
@@ -473,15 +482,6 @@ function PlanContent() {
                       <span>Add to Plan</span>
                     </button>
                   )}
-
-                  {/* View Details button */}
-                  <Link
-                    href={`/workout/${item.id}`}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#151921] border border-[#374151] text-xs font-bold text-gray-200 uppercase tracking-wider hover:text-white hover:border-gray-400 transition-colors"
-                  >
-                    <Eye className="w-3.5 h-3.5 text-gray-400" />
-                    <span>View Details</span>
-                  </Link>
 
                   {/* Remove (X) button (Challenge C3) */}
                   <button
