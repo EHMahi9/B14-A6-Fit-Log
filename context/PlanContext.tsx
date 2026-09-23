@@ -1,6 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useSyncExternalStore,
+  useCallback,
+} from "react";
 import { Workout, PlannedWorkout } from "@/types/workout";
 import { useToast } from "@/components/ui/Toast";
 
@@ -26,133 +31,222 @@ const PLAN_STORAGE_KEY = "fitlog_today_plan_v1";
 const SAVED_STORAGE_KEY = "fitlog_saved_workouts_v1";
 const MAX_PLAN_LIFTS = 5;
 
+// Storage subscribers for React 19 useSyncExternalStore
+const storageSubscribers = new Set<() => void>();
+
+function subscribe(callback: () => void) {
+  storageSubscribers.add(callback);
+  const handleStorage = (e: StorageEvent) => {
+    if (e.key === PLAN_STORAGE_KEY || e.key === SAVED_STORAGE_KEY) {
+      callback();
+    }
+  };
+  window.addEventListener("storage", handleStorage);
+  return () => {
+    storageSubscribers.delete(callback);
+    window.removeEventListener("storage", handleStorage);
+  };
+}
+
+function emitStorageChange() {
+  storageSubscribers.forEach((cb) => cb());
+}
+
+let cachedPlanRaw: string | null = null;
+let cachedPlanParsed: PlannedWorkout[] = [];
+
+function getPlanSnapshot(): PlannedWorkout[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(PLAN_STORAGE_KEY);
+    if (raw !== cachedPlanRaw) {
+      cachedPlanRaw = raw;
+      cachedPlanParsed = raw ? JSON.parse(raw) : [];
+    }
+    return cachedPlanParsed;
+  } catch {
+    return [];
+  }
+}
+
+let cachedSavedRaw: string | null = null;
+let cachedSavedParsed: Workout[] = [];
+
+function getSavedSnapshot(): Workout[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(SAVED_STORAGE_KEY);
+    if (raw !== cachedSavedRaw) {
+      cachedSavedRaw = raw;
+      cachedSavedParsed = raw ? JSON.parse(raw) : [];
+    }
+    return cachedSavedParsed;
+  } catch {
+    return [];
+  }
+}
+
+const emptyPlan: PlannedWorkout[] = [];
+const emptySaved: Workout[] = [];
+
+function getServerPlanSnapshot(): PlannedWorkout[] {
+  return emptyPlan;
+}
+
+function getServerSavedSnapshot(): Workout[] {
+  return emptySaved;
+}
+
 export function PlanProvider({ children }: { children: React.ReactNode }) {
-  const [plan, setPlan] = useState<PlannedWorkout[]>([]);
-  const [saved, setSaved] = useState<Workout[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const plan = useSyncExternalStore(
+    subscribe,
+    getPlanSnapshot,
+    getServerPlanSnapshot
+  );
+  const saved = useSyncExternalStore(
+    subscribe,
+    getSavedSnapshot,
+    getServerSavedSnapshot
+  );
   const { showToast } = useToast();
 
-  // Load from localStorage on client mount
-  useEffect(() => {
-    try {
-      const storedPlan = localStorage.getItem(PLAN_STORAGE_KEY);
-      const storedSaved = localStorage.getItem(SAVED_STORAGE_KEY);
+  const isPlanned = useCallback(
+    (workoutId: number) => {
+      return plan.some((item) => item.id === workoutId);
+    },
+    [plan]
+  );
 
-      if (storedPlan) {
-        setPlan(JSON.parse(storedPlan));
-      }
-      if (storedSaved) {
-        setSaved(JSON.parse(storedSaved));
-      }
+  const isSaved = useCallback(
+    (workoutId: number) => {
+      return saved.some((item) => item.id === workoutId);
+    },
+    [saved]
+  );
+
+  const setPlanStorage = useCallback((newPlan: PlannedWorkout[]) => {
+    try {
+      localStorage.setItem(PLAN_STORAGE_KEY, JSON.stringify(newPlan));
+      cachedPlanRaw = JSON.stringify(newPlan);
+      cachedPlanParsed = newPlan;
+      emitStorageChange();
     } catch (e) {
-      console.error("Failed to load plans from localStorage", e);
-    } finally {
-      setIsLoaded(true);
+      console.error("Failed to write plan to localStorage", e);
     }
   }, []);
 
-  // Save to localStorage when state changes
-  useEffect(() => {
-    if (!isLoaded) return;
+  const setSavedStorage = useCallback((newSaved: Workout[]) => {
     try {
-      localStorage.setItem(PLAN_STORAGE_KEY, JSON.stringify(plan));
+      localStorage.setItem(SAVED_STORAGE_KEY, JSON.stringify(newSaved));
+      cachedSavedRaw = JSON.stringify(newSaved);
+      cachedSavedParsed = newSaved;
+      emitStorageChange();
     } catch (e) {
-      console.error("Failed to persist plan to localStorage", e);
+      console.error("Failed to write saved list to localStorage", e);
     }
-  }, [plan, isLoaded]);
+  }, []);
 
-  useEffect(() => {
-    if (!isLoaded) return;
-    try {
-      localStorage.setItem(SAVED_STORAGE_KEY, JSON.stringify(saved));
-    } catch (e) {
-      console.error("Failed to persist saved list to localStorage", e);
-    }
-  }, [saved, isLoaded]);
+  const addToPlan = useCallback(
+    (workout: Workout): boolean => {
+      if (isPlanned(workout.id)) {
+        showToast(`${workout.name} is already in today's plan!`, "info");
+        return false;
+      }
 
-  const isPlanned = (workoutId: number) => {
-    return plan.some((item) => item.id === workoutId);
-  };
+      if (plan.length >= MAX_PLAN_LIFTS) {
+        showToast(
+          `Cap reached! Maximum of ${MAX_PLAN_LIFTS} lifts allowed for today.`,
+          "warning"
+        );
+        return false;
+      }
 
-  const isSaved = (workoutId: number) => {
-    return saved.some((item) => item.id === workoutId);
-  };
+      const newPlannedItem: PlannedWorkout = {
+        ...workout,
+        completed: false,
+        addedAt: new Date().toISOString(),
+      };
 
-  const addToPlan = (workout: Workout): boolean => {
-    if (isPlanned(workout.id)) {
-      showToast(`${workout.name} is already in today's plan!`, "info");
-      return false;
-    }
+      const updated = [...plan, newPlannedItem];
+      setPlanStorage(updated);
+      showToast(`Added ${workout.name} to today's plan!`, "success");
+      return true;
+    },
+    [plan, isPlanned, setPlanStorage, showToast]
+  );
 
-    if (plan.length >= MAX_PLAN_LIFTS) {
+  const removeFromPlan = useCallback(
+    (workoutId: number) => {
+      const item = plan.find((p) => p.id === workoutId);
+      const updated = plan.filter((p) => p.id !== workoutId);
+      setPlanStorage(updated);
       showToast(
-        `Cap reached! Maximum of ${MAX_PLAN_LIFTS} lifts allowed for today.`,
-        "warning"
+        item
+          ? `Removed ${item.name} from today's plan`
+          : "Workout removed from plan",
+        "info"
       );
-      return false;
-    }
+    },
+    [plan, setPlanStorage, showToast]
+  );
 
-    const newPlannedItem: PlannedWorkout = {
-      ...workout,
-      completed: false,
-      addedAt: new Date().toISOString(),
-    };
-
-    setPlan((prev) => [...prev, newPlannedItem]);
-    showToast(`Added ${workout.name} to today's plan!`, "success");
-    return true;
-  };
-
-  const removeFromPlan = (workoutId: number) => {
-    const item = plan.find((p) => p.id === workoutId);
-    setPlan((prev) => prev.filter((p) => p.id !== workoutId));
-    showToast(
-      item ? `Removed ${item.name} from today's plan` : "Workout removed from plan",
-      "info"
-    );
-  };
-
-  const markAsDone = (workoutId: number) => {
-    setPlan((prev) =>
-      prev.map((item) => {
+  const markAsDone = useCallback(
+    (workoutId: number) => {
+      let toggledItem: PlannedWorkout | undefined;
+      const updated = plan.map((item) => {
         if (item.id === workoutId) {
-          const nextState = !item.completed;
-          showToast(
-            nextState
-              ? `Completed ${item.name}! Keep crushing it.`
-              : `Marked ${item.name} as incomplete`,
-            "success"
-          );
-          return { ...item, completed: nextState };
+          toggledItem = { ...item, completed: !item.completed };
+          return toggledItem;
         }
         return item;
-      })
-    );
-  };
+      });
+      setPlanStorage(updated);
+      if (toggledItem) {
+        showToast(
+          toggledItem.completed
+            ? `Completed ${toggledItem.name}! Keep crushing it.`
+            : `Marked ${toggledItem.name} as incomplete`,
+          "success"
+        );
+      }
+    },
+    [plan, setPlanStorage, showToast]
+  );
 
-  const addToSaved = (workout: Workout): boolean => {
-    if (isSaved(workout.id)) {
-      showToast(`${workout.name} is already saved for later!`, "info");
-      return false;
-    }
+  const addToSaved = useCallback(
+    (workout: Workout): boolean => {
+      if (isSaved(workout.id)) {
+        showToast(`${workout.name} is already saved for later!`, "info");
+        return false;
+      }
 
-    setSaved((prev) => [...prev, workout]);
-    showToast(`Saved ${workout.name} for later!`, "success");
-    return true;
-  };
+      const updated = [...saved, workout];
+      setSavedStorage(updated);
+      showToast(`Saved ${workout.name} for later!`, "success");
+      return true;
+    },
+    [saved, isSaved, setSavedStorage, showToast]
+  );
 
-  const removeFromSaved = (workoutId: number) => {
-    const item = saved.find((s) => s.id === workoutId);
-    setSaved((prev) => prev.filter((s) => s.id !== workoutId));
-    showToast(
-      item ? `Removed ${item.name} from saved` : "Workout removed from saved",
-      "info"
-    );
-  };
+  const removeFromSaved = useCallback(
+    (workoutId: number) => {
+      const item = saved.find((s) => s.id === workoutId);
+      const updated = saved.filter((s) => s.id !== workoutId);
+      setSavedStorage(updated);
+      showToast(
+        item ? `Removed ${item.name} from saved` : "Workout removed from saved",
+        "info"
+      );
+    },
+    [saved, setSavedStorage, showToast]
+  );
 
   // Live Metrics calculations
   const totalExercises = plan.length;
-  const totalMinutes = plan.reduce((sum, item) => sum + (item.duration || 0), 0);
+  const totalMinutes = plan.reduce(
+    (sum, item) => sum + (item.duration || 0),
+    0
+  );
   const totalCalories = plan.reduce(
     (sum, item) => sum + (item.caloriesBurned || 0),
     0
@@ -163,7 +257,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
       value={{
         plan,
         saved,
-        isLoaded,
+        isLoaded: true,
         addToPlan,
         removeFromPlan,
         markAsDone,
