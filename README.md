@@ -6,7 +6,7 @@
 ---
 
 ## 🚀 Live Demo & Repository
-- **Live URL**: [https://fit-log-omega.vercel.app](https://fit-log-omega.vercel.app) *(or your deployed production link)*
+- **Live URL**: [https://fit-log-mahi.vercel.app](https://fit-log-mahi.vercel.app)
 - **GitHub Repository**: [https://github.com/EHMahi9/B14-A6-Fit-Log](https://github.com/EHMahi9/B14-A6-Fit-Log)
 
 ---
