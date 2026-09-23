@@ -7,7 +7,7 @@
 
 ## 🚀 Live Demo & Repository
 - **Live URL**: [https://fit-log-omega.vercel.app](https://fit-log-omega.vercel.app) *(or your deployed production link)*
-- **GitHub Repository**: [https://github.com/ProgrammingHero1/B14-A6-Fit-Log](https://github.com/ProgrammingHero1/B14-A6-Fit-Log)
+- **GitHub Repository**: [https://github.com/EHMahi9/B14-A6-Fit-Log](https://github.com/EHMahi9/B14-A6-Fit-Log)
 
 ---
 
@@ -99,7 +99,7 @@
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/ProgrammingHero1/B14-A6-Fit-Log.git
+   git clone https://github.com/EHMahi9/B14-A6-Fit-Log.git
    cd B14-A6-Fit-Log
    ```
 
