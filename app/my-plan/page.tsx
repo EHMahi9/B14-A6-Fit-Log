@@ -15,7 +15,6 @@ import {
   ChevronDown,
   Dumbbell,
   ArrowRight,
-  Flame as FlameIcon,
   CheckCircle2,
   CalendarCheck,
   Plus,
@@ -86,54 +85,36 @@ export default function MyPlanPage() {
         </p>
       </div>
 
-      {/* Metrics Summary Row (3 Stat Cards) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 p-1 rounded-2xl bg-[#13161d] border border-[#232732] shadow-xl">
+      {/* Metrics Summary Row matching Figma */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[#232732] rounded-2xl bg-[#13161d] border border-[#232732] shadow-xl overflow-hidden">
         {/* Exercises */}
-        <div className="p-5 rounded-xl bg-[#151921] border border-[#20242e] flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-              Exercises
-            </span>
-            <p className="font-[family-name:var(--font-oswald)] font-extrabold text-3xl sm:text-4xl text-white">
-              {totalExercises}
-              <span className="text-xs text-gray-500 font-sans ml-1">/ 5 max</span>
-            </p>
-          </div>
-          <div className="w-12 h-12 rounded-xl bg-[#1a2312] border border-[#2d3a20] flex items-center justify-center text-[#c2f800]">
-            <Dumbbell className="w-6 h-6" />
-          </div>
+        <div className="p-6 sm:p-7 flex flex-col justify-center">
+          <span className="font-[family-name:var(--font-oswald)] font-extrabold text-3xl sm:text-4xl text-white">
+            {totalExercises}
+          </span>
+          <span className="text-xs sm:text-sm font-semibold text-gray-400 mt-1">
+            Exercises
+          </span>
         </div>
 
         {/* Minutes */}
-        <div className="p-5 rounded-xl bg-[#151921] border border-[#20242e] flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-              Minutes
-            </span>
-            <p className="font-[family-name:var(--font-oswald)] font-extrabold text-3xl sm:text-4xl text-white">
-              {totalMinutes}
-              <span className="text-xs text-gray-500 font-sans ml-1">min</span>
-            </p>
-          </div>
-          <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
-            <Clock className="w-6 h-6" />
-          </div>
+        <div className="p-6 sm:p-7 flex flex-col justify-center">
+          <span className="font-[family-name:var(--font-oswald)] font-extrabold text-3xl sm:text-4xl text-white">
+            {totalMinutes}
+          </span>
+          <span className="text-xs sm:text-sm font-semibold text-gray-400 mt-1">
+            Minutes
+          </span>
         </div>
 
         {/* Calories */}
-        <div className="p-5 rounded-xl bg-[#151921] border border-[#20242e] flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-              Calories
-            </span>
-            <p className="font-[family-name:var(--font-oswald)] font-extrabold text-3xl sm:text-4xl text-white">
-              {totalCalories}
-              <span className="text-xs text-gray-500 font-sans ml-1">kcal</span>
-            </p>
-          </div>
-          <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-            <FlameIcon className="w-6 h-6" />
-          </div>
+        <div className="p-6 sm:p-7 flex flex-col justify-center">
+          <span className="font-[family-name:var(--font-oswald)] font-extrabold text-3xl sm:text-4xl text-white">
+            {totalCalories}
+          </span>
+          <span className="text-xs sm:text-sm font-semibold text-gray-400 mt-1">
+            Calories
+          </span>
         </div>
       </div>
 

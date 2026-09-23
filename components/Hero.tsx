@@ -48,19 +48,17 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Right Column: Hero Visual Image */}
-        <div className="lg:col-span-5 relative w-full flex items-center justify-center">
-          <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] rounded-2xl overflow-hidden border border-[#232834] bg-[#1a1d24] shadow-xl group">
+        {/* Right Column: Hero Visual Image matching Figma */}
+        <div className="lg:col-span-5 relative w-full flex items-center justify-center py-4 lg:py-0">
+          <div className="relative w-full max-w-sm lg:max-w-none h-64 sm:h-80 lg:h-96 flex items-center justify-center">
             <Image
-              src="/assets/banner.png"
-              alt="Athlete training with barbell"
+              src="/assets/hero-machine.png"
+              alt="Athlete training on workout machine"
               fill
               priority
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
-              className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
+              className="object-contain object-center filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.7)] transition-transform duration-500 hover:scale-105"
             />
-            {/* Subtle dark gradient overlay at base */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#15171d]/80 via-transparent to-transparent pointer-events-none" />
           </div>
         </div>
       </div>

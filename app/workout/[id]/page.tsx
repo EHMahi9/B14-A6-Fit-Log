@@ -11,11 +11,7 @@ import {
   Plus,
   Bookmark,
   Check,
-  Clock,
   Star,
-  Dumbbell,
-  Layers,
-  Gauge,
   AlertCircle,
 } from "lucide-react";
 
@@ -152,12 +148,12 @@ export default function WorkoutDetailPage() {
 
         {/* Right Column: Exercise Information & Actions */}
         <div className="lg:col-span-7 flex flex-col gap-6 sm:gap-8">
-          {/* Category Tags */}
+          {/* Category Tags matching Figma */}
           <div className="flex flex-wrap items-center gap-2">
             {workout.muscleGroups.map((group) => (
               <span
                 key={group}
-                className="px-3.5 py-1 rounded-full bg-[#1a2312] border border-[#2d3a20] text-[#c2f800] text-xs font-bold uppercase tracking-widest"
+                className="px-3.5 py-1 rounded-full bg-[#c2f800] text-[#0f1115] text-xs font-bold uppercase tracking-wider shadow-sm"
               >
                 {group}
               </span>
@@ -174,58 +170,70 @@ export default function WorkoutDetailPage() {
             </p>
           </div>
 
-          {/* Key Specs Table / Panel (matching Penpot design) */}
-          <div className="rounded-2xl bg-[#151922] border border-[#232834] overflow-hidden shadow-lg">
-            <div className="px-5 py-3.5 border-b border-[#1e2330] bg-[#12151c]">
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-                Key Exercise Specs
+          {/* Key Specs Table / Panel matching Figma 7-row layout */}
+          <div className="rounded-2xl bg-[#151922] border border-[#232834] divide-y divide-[#1e2330] overflow-hidden shadow-lg">
+            <div className="flex items-center justify-between px-5 py-3 text-xs sm:text-sm">
+              <span className="font-semibold text-gray-400 uppercase tracking-wider">
+                EQUIPMENT
+              </span>
+              <span className="font-bold text-white text-right">
+                {workout.equipment}
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[#1e2330]">
-              {/* Equipment */}
-              <div className="p-4 flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 text-gray-400 text-xs uppercase font-medium">
-                  <Dumbbell className="w-3.5 h-3.5" />
-                  <span>Equipment</span>
-                </div>
-                <span className="text-sm font-bold text-white line-clamp-1">
-                  {workout.equipment}
-                </span>
-              </div>
+            <div className="flex items-center justify-between px-5 py-3 text-xs sm:text-sm">
+              <span className="font-semibold text-gray-400 uppercase tracking-wider">
+                DIFFICULTY
+              </span>
+              <span className="font-bold text-white text-right">
+                {workout.difficulty}
+              </span>
+            </div>
 
-              {/* Difficulty */}
-              <div className="p-4 flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 text-gray-400 text-xs uppercase font-medium">
-                  <Gauge className="w-3.5 h-3.5" />
-                  <span>Difficulty</span>
-                </div>
-                <span className="text-sm font-bold text-white">
-                  {workout.difficulty}
-                </span>
-              </div>
+            <div className="flex items-center justify-between px-5 py-3 text-xs sm:text-sm">
+              <span className="font-semibold text-gray-400 uppercase tracking-wider">
+                SETS
+              </span>
+              <span className="font-bold text-white text-right">
+                {workout.sets}
+              </span>
+            </div>
 
-              {/* Sets & Reps */}
-              <div className="p-4 flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 text-gray-400 text-xs uppercase font-medium">
-                  <Layers className="w-3.5 h-3.5" />
-                  <span>Sets / Reps</span>
-                </div>
-                <span className="text-sm font-bold text-white">
-                  {workout.sets} sets × {workout.reps}
-                </span>
-              </div>
+            <div className="flex items-center justify-between px-5 py-3 text-xs sm:text-sm">
+              <span className="font-semibold text-gray-400 uppercase tracking-wider">
+                REPS
+              </span>
+              <span className="font-bold text-white text-right">
+                {workout.reps}
+              </span>
+            </div>
 
-              {/* Duration & Calories */}
-              <div className="p-4 flex flex-col gap-1">
-                <div className="flex items-center gap-1.5 text-gray-400 text-xs uppercase font-medium">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>Duration</span>
-                </div>
-                <span className="text-sm font-bold text-white">
-                  {workout.duration} min / {workout.caloriesBurned} kcal
-                </span>
-              </div>
+            <div className="flex items-center justify-between px-5 py-3 text-xs sm:text-sm">
+              <span className="font-semibold text-gray-400 uppercase tracking-wider">
+                DURATION
+              </span>
+              <span className="font-bold text-white text-right">
+                {workout.duration} min
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between px-5 py-3 text-xs sm:text-sm">
+              <span className="font-semibold text-gray-400 uppercase tracking-wider">
+                CALORIES
+              </span>
+              <span className="font-bold text-white text-right">
+                {workout.caloriesBurned} kcal
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between px-5 py-3 text-xs sm:text-sm">
+              <span className="font-semibold text-gray-400 uppercase tracking-wider">
+                RATING
+              </span>
+              <span className="font-bold text-[#c2f800] text-right flex items-center gap-1">
+                <Star className="w-3.5 h-3.5 fill-[#c2f800]" />
+                {workout.rating}
+              </span>
             </div>
           </div>
 
