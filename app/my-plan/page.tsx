@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams, useRouter } from "next/navigation";
 import { usePlan } from "@/context/PlanContext";
 import { SortOption, PlannedWorkout, Workout } from "@/types/workout";
 import {
@@ -18,9 +19,14 @@ import {
   CheckCircle2,
   CalendarCheck,
   Plus,
+  Bookmark,
 } from "lucide-react";
 
-export default function MyPlanPage() {
+function PlanContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+
   const {
     plan,
     saved,
@@ -29,26 +35,56 @@ export default function MyPlanPage() {
     removeFromPlan,
     removeFromSaved,
     addToPlan,
-    totalExercises,
-    totalMinutes,
-    totalCalories,
   } = usePlan();
 
-  const [activeTab, setActiveTab] = useState<"plan" | "saved">("plan");
+  const [selectedTab, setSelectedTab] = useState<"plan" | "saved" | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("Duration");
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+
+  // Derive activeTab directly from URL param, manual selection, or data availability
+  const activeTab: "plan" | "saved" = useMemo(() => {
+    if (selectedTab) return selectedTab;
+    if (tabParam === "saved") return "saved";
+    if (tabParam === "plan") return "plan";
+    if (plan.length === 0 && saved.length > 0) return "saved";
+    return "plan";
+  }, [selectedTab, tabParam, plan.length, saved.length]);
+
+  const handleTabChange = (newTab: "plan" | "saved") => {
+    setSelectedTab(newTab);
+    router.replace(`/my-plan?tab=${newTab}`, { scroll: false });
+  };
+
+  // Metrics calculation for the active view
+  const currentItems = activeTab === "plan" ? plan : saved;
+  const currentCount = currentItems.length;
+  const currentMinutes = currentItems.reduce(
+    (sum, item) => sum + (item.duration || 0),
+    0
+  );
+  const currentCalories = currentItems.reduce(
+    (sum, item) => sum + (item.caloriesBurned || 0),
+    0
+  );
 
   // Sorting logic (Challenge C1)
   const sortedItems = useMemo(() => {
     const list = activeTab === "plan" ? [...plan] : [...saved];
 
     return list.sort((a, b) => {
+      const durA = a.duration || 0;
+      const durB = b.duration || 0;
+      const calA = a.caloriesBurned || 0;
+      const calB = b.caloriesBurned || 0;
+      const ratA = a.rating || 0;
+      const ratB = b.rating || 0;
+
       if (sortBy === "Duration") {
-        return b.duration - a.duration; // Highest duration first
+        return durB - durA; // Highest duration first
       } else if (sortBy === "Calories") {
-        return b.caloriesBurned - a.caloriesBurned; // Highest calories first
+        return calB - calA; // Highest calories first
       } else if (sortBy === "Rating") {
-        return b.rating - a.rating; // Highest rating first
+        return ratB - ratA; // Highest rating first
       }
       return 0;
     });
@@ -90,17 +126,17 @@ export default function MyPlanPage() {
         {/* Exercises */}
         <div className="p-6 sm:p-7 flex flex-col justify-center">
           <span className="font-[family-name:var(--font-oswald)] font-extrabold text-3xl sm:text-4xl text-white">
-            {totalExercises}
+            {currentCount}
           </span>
           <span className="text-xs sm:text-sm font-semibold text-gray-400 mt-1">
-            Exercises
+            Exercises {activeTab === "saved" ? "(Saved)" : "(Today's Plan)"}
           </span>
         </div>
 
         {/* Minutes */}
         <div className="p-6 sm:p-7 flex flex-col justify-center">
           <span className="font-[family-name:var(--font-oswald)] font-extrabold text-3xl sm:text-4xl text-white">
-            {totalMinutes}
+            {currentMinutes}
           </span>
           <span className="text-xs sm:text-sm font-semibold text-gray-400 mt-1">
             Minutes
@@ -110,7 +146,7 @@ export default function MyPlanPage() {
         {/* Calories */}
         <div className="p-6 sm:p-7 flex flex-col justify-center">
           <span className="font-[family-name:var(--font-oswald)] font-extrabold text-3xl sm:text-4xl text-white">
-            {totalCalories}
+            {currentCalories}
           </span>
           <span className="text-xs sm:text-sm font-semibold text-gray-400 mt-1">
             Calories
@@ -123,7 +159,7 @@ export default function MyPlanPage() {
         {/* Tabs: Today's Plan / Saved */}
         <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#151921] border border-[#232732] self-start">
           <button
-            onClick={() => setActiveTab("plan")}
+            onClick={() => handleTabChange("plan")}
             className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all ${
               activeTab === "plan"
                 ? "bg-[#1f242d] text-white border border-[#2b303d] shadow-sm"
@@ -144,13 +180,14 @@ export default function MyPlanPage() {
           </button>
 
           <button
-            onClick={() => setActiveTab("saved")}
+            onClick={() => handleTabChange("saved")}
             className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all ${
               activeTab === "saved"
                 ? "bg-[#1f242d] text-white border border-[#2b303d] shadow-sm"
                 : "text-gray-400 hover:text-white"
             }`}
           >
+            <Bookmark className="w-4 h-4 text-[#c2f800]" />
             <span>Saved</span>
             <span
               className={`px-1.5 py-0.5 rounded-full text-[11px] font-extrabold ${
@@ -213,17 +250,21 @@ export default function MyPlanPage() {
       {isEmpty ? (
         <div className="p-12 sm:p-16 rounded-3xl bg-[#111317] border border-[#232732] text-center space-y-5">
           <div className="w-16 h-16 rounded-full bg-[#15171d] border border-[#222630] text-gray-400 mx-auto flex items-center justify-center">
-            <Dumbbell className="w-8 h-8 text-[#c2f800]" />
+            {activeTab === "saved" ? (
+              <Bookmark className="w-8 h-8 text-[#c2f800]" />
+            ) : (
+              <Dumbbell className="w-8 h-8 text-[#c2f800]" />
+            )}
           </div>
 
           <div className="space-y-1.5">
             <h2 className="font-[family-name:var(--font-oswald)] font-extrabold text-2xl sm:text-3xl text-white uppercase tracking-tight">
-              NOTHING HERE YET
+              {activeTab === "saved" ? "NO SAVED WORKOUTS YET" : "NOTHING HERE YET"}
             </h2>
             <p className="text-gray-400 text-sm sm:text-base max-w-md mx-auto">
               {activeTab === "plan"
                 ? "Browse the library and add a lift to get today moving."
-                : "Save your favorite lifts from the library for quick access later."}
+                : "Save your favorite lifts from the library to quickly find them here later."}
             </p>
           </div>
 
@@ -373,5 +414,22 @@ export default function MyPlanPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MyPlanPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center space-y-4">
+          <div className="w-10 h-10 border-2 border-[#c2f800] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-gray-400 text-sm font-medium tracking-wide">
+            Loading workouts…
+          </p>
+        </div>
+      }
+    >
+      <PlanContent />
+    </Suspense>
   );
 }

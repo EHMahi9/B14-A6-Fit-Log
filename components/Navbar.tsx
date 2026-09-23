@@ -66,7 +66,7 @@ export default function Navbar() {
         <div className="hidden sm:flex items-center gap-3">
           {/* Plan badge = filled pill with accent background (#c2f800) */}
           <Link
-            href="/my-plan"
+            href="/my-plan?tab=plan"
             className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#c2f800] text-[#0f1115] text-xs font-bold transition-all duration-200 hover:brightness-110 hover:shadow-[0_0_12px_rgba(194,248,0,0.35)]"
             title="View Today's Plan"
           >
@@ -78,7 +78,7 @@ export default function Navbar() {
 
           {/* Saved badge = pill with outline/border only */}
           <Link
-            href="/my-plan"
+            href="/my-plan?tab=saved"
             className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#2d313b] bg-[#15171d]/60 text-gray-200 text-xs font-bold transition-all duration-200 hover:border-gray-500 hover:text-white"
             title="View Saved Workouts"
           >
@@ -92,12 +92,22 @@ export default function Navbar() {
         {/* Mobile Hamburger Toggle */}
         <div className="flex sm:hidden items-center gap-2">
           <Link
-            href="/my-plan"
+            href="/my-plan?tab=plan"
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#c2f800] text-[#0f1115] text-xs font-bold"
           >
             <span>Plan</span>
             <span className="bg-[#0f1115] text-[#c2f800] px-1.5 py-0.5 rounded-full text-[10px]">
               {totalExercises}
+            </span>
+          </Link>
+
+          <Link
+            href="/my-plan?tab=saved"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#2d313b] text-gray-300 text-xs font-bold"
+          >
+            <span>Saved</span>
+            <span className="bg-[#20242e] text-white px-1.5 py-0.5 rounded-full text-[10px]">
+              {saved.length}
             </span>
           </Link>
 
@@ -131,23 +141,25 @@ export default function Navbar() {
             </Link>
 
             <Link
-              href="/my-plan"
+              href="/my-plan?tab=plan"
               onClick={() => setMobileMenuOpen(false)}
-              className={`px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-between ${
-                isPlanActive
-                  ? "bg-[#1a2312] text-[#c2f800] border border-[#2d3a20]"
-                  : "text-gray-300 hover:bg-[#15171d]"
-              }`}
+              className="px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-between text-gray-300 hover:bg-[#15171d]"
             >
-              <span>My Plan & Saved</span>
-              <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded-full bg-[#c2f800] text-[#0f1115] text-xs font-bold">
-                  {totalExercises}
-                </span>
-                <span className="px-2 py-0.5 rounded-full border border-[#2d313b] text-xs text-gray-300">
-                  {saved.length}
-                </span>
-              </div>
+              <span>Today&apos;s Plan</span>
+              <span className="px-2 py-0.5 rounded-full bg-[#c2f800] text-[#0f1115] text-xs font-bold">
+                {totalExercises}
+              </span>
+            </Link>
+
+            <Link
+              href="/my-plan?tab=saved"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-between text-gray-300 hover:bg-[#15171d]"
+            >
+              <span>Saved Workouts</span>
+              <span className="px-2 py-0.5 rounded-full border border-[#2d313b] text-xs text-gray-300">
+                {saved.length}
+              </span>
             </Link>
           </nav>
         </div>
