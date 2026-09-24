@@ -76,10 +76,10 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* Saved badge = pill with outline/border only */}
+          {/* Saved badge = pill with outline/border only, turns green on click/hover */}
           <Link
             href="/my-plan?tab=saved"
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#2d313b] bg-[#15171d]/60 text-gray-200 text-xs font-bold transition-all duration-200 hover:border-gray-500 hover:text-white"
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#2d313b] bg-[#15171d]/60 text-gray-200 text-xs font-bold transition-all duration-200 hover:border-[#c2f800] hover:text-[#c2f800] active:bg-[#c2f800] active:text-[#0f1115] active:border-[#c2f800]"
             title="View Saved Workouts"
           >
             <span className="tracking-wide uppercase font-semibold text-gray-300">Saved</span>
@@ -103,7 +103,7 @@ export default function Navbar() {
 
           <Link
             href="/my-plan?tab=saved"
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#2d313b] text-gray-300 text-xs font-bold"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#2d313b] text-gray-300 text-xs font-bold hover:border-[#c2f800] hover:text-[#c2f800] active:bg-[#c2f800] active:text-[#0f1115]"
           >
             <span>Saved</span>
             <span className="bg-[#20242e] text-white px-1.5 py-0.5 rounded-full text-[10px]">

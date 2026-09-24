@@ -24,7 +24,7 @@ export default function WorkoutDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { addToPlan, addToSaved, isPlanned, isSaved, plan } = usePlan();
+  const { addToPlan, addToSaved, removeFromSaved, isPlanned, isSaved, plan } = usePlan();
 
   useEffect(() => {
     if (!id) return;
@@ -269,20 +269,27 @@ export default function WorkoutDetailPage() {
               )}
             </button>
 
-            {/* Secondary Button: Save for Later */}
+            {/* Secondary Button: Save for Later (Turns green when saved) */}
             <button
-              onClick={() => addToSaved(workout)}
-              disabled={saved}
-              className={`flex items-center justify-center gap-2.5 px-6 py-4 rounded-xl font-bold text-sm sm:text-base uppercase tracking-wider transition-all duration-200 border ${
+              onClick={() => {
+                if (saved) {
+                  removeFromSaved(workout.id);
+                } else {
+                  addToSaved(workout);
+                }
+              }}
+              className={`flex items-center justify-center gap-2.5 px-6 py-4 rounded-xl font-bold text-sm sm:text-base uppercase tracking-wider transition-all duration-200 border cursor-pointer active:scale-[0.98] ${
                 saved
-                  ? "bg-[#1a1d24] text-gray-400 border-[#2d313b] cursor-default"
-                  : "border-[#374151] bg-[#15171d] text-white hover:bg-[#1a1d24] hover:border-gray-400"
+                  ? "bg-[#1a2312] text-[#c2f800] border-[#2d3a20] shadow-sm shadow-[#c2f800]/20 hover:bg-[#223018] hover:border-[#384828]"
+                  : "border-[#374151] bg-[#15171d] text-white hover:bg-[#1a1d24] hover:border-[#c2f800]/50 hover:text-[#c2f800] active:bg-[#c2f800] active:text-[#0f1115]"
               }`}
+              title={saved ? "Saved (click to unsave)" : "Save for later"}
+              aria-label={saved ? "Remove from saved" : "Save for later"}
             >
               {saved ? (
                 <>
                   <Check className="w-5 h-5 text-[#c2f800]" />
-                  <span>Saved</span>
+                  <span className="text-[#c2f800]">Saved</span>
                 </>
               ) : (
                 <>

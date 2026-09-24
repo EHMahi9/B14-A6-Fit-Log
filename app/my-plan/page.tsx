@@ -165,10 +165,10 @@ function PlanContent() {
         <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#151921] border border-[#232732] self-start">
           <button
             onClick={() => handleTabChange("plan")}
-            className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all ${
+            className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-200 active:scale-[0.98] ${
               activeTab === "plan"
-                ? "bg-[#1f242d] text-white border border-[#2b303d] shadow-sm"
-                : "text-gray-400 hover:text-white"
+                ? "bg-[#1a2312] text-[#c2f800] border border-[#2d3a20] shadow-sm shadow-[#c2f800]/15"
+                : "text-gray-400 hover:text-white hover:bg-white/5"
             }`}
           >
             <CalendarCheck className="w-4 h-4 text-[#c2f800]" />
@@ -186,10 +186,10 @@ function PlanContent() {
 
           <button
             onClick={() => handleTabChange("saved")}
-            className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all ${
+            className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-200 active:scale-[0.98] ${
               activeTab === "saved"
-                ? "bg-[#1f242d] text-white border border-[#2b303d] shadow-sm"
-                : "text-gray-400 hover:text-white"
+                ? "bg-[#1a2312] text-[#c2f800] border border-[#2d3a20] shadow-sm shadow-[#c2f800]/15"
+                : "text-gray-400 hover:text-white hover:bg-white/5"
             }`}
           >
             <Bookmark className="w-4 h-4 text-[#c2f800]" />
