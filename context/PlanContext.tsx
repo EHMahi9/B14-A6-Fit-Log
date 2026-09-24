@@ -5,6 +5,7 @@ import React, {
   useContext,
   useSyncExternalStore,
   useCallback,
+  useState,
 } from "react";
 import { Workout, PlannedWorkout } from "@/types/workout";
 import { useToast } from "@/components/ui/Toast";
@@ -13,6 +14,8 @@ interface PlanContextType {
   plan: PlannedWorkout[];
   saved: Workout[];
   isLoaded: boolean;
+  activeTab: "plan" | "saved";
+  setActiveTab: (tab: "plan" | "saved") => void;
   addToPlan: (workout: Workout) => boolean;
   removeFromPlan: (workoutId: number) => void;
   markAsDone: (workoutId: number) => void;
@@ -109,6 +112,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     getServerSavedSnapshot
   );
   const { showToast } = useToast();
+  const [activeTab, setActiveTab] = useState<"plan" | "saved">("plan");
 
   const isPlanned = useCallback(
     (workoutId: number) => {
@@ -258,6 +262,8 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
         plan,
         saved,
         isLoaded: true,
+        activeTab,
+        setActiveTab,
         addToPlan,
         removeFromPlan,
         markAsDone,

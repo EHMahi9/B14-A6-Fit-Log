@@ -9,7 +9,7 @@ import { Menu, X, Dumbbell } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { totalExercises, saved } = usePlan();
+  const { totalExercises, saved, activeTab, setActiveTab } = usePlan();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isWorkoutActive = pathname === "/" || pathname.startsWith("/workout");
@@ -62,28 +62,62 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        {/* Right: Status Badges (Counters) */}
+        {/* Right: Status Badges (Counters) - Green highlight shifts between Plan and Saved */}
         <div className="hidden sm:flex items-center gap-3">
-          {/* Plan badge = filled pill with accent background (#c2f800) */}
+          {/* Plan badge */}
           <Link
             href="/my-plan?tab=plan"
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#c2f800] text-[#0f1115] text-xs font-bold transition-all duration-200 hover:brightness-110 hover:shadow-[0_0_12px_rgba(194,248,0,0.35)]"
+            onClick={() => setActiveTab("plan")}
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 ${
+              activeTab === "plan"
+                ? "bg-[#c2f800] text-[#0f1115] shadow-sm shadow-[#c2f800]/25 hover:brightness-110"
+                : "border border-[#2d313b] bg-[#15171d]/60 text-gray-200 hover:border-gray-500 hover:text-white"
+            }`}
             title="View Today's Plan"
           >
-            <span className="tracking-wide uppercase font-semibold">Plan</span>
-            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-[#0f1115] text-[#c2f800] text-xs font-extrabold">
+            <span
+              className={`tracking-wide uppercase font-semibold ${
+                activeTab === "plan" ? "text-[#0f1115]" : "text-gray-300"
+              }`}
+            >
+              Plan
+            </span>
+            <span
+              className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-xs font-extrabold ${
+                activeTab === "plan"
+                  ? "bg-[#0f1115] text-[#c2f800]"
+                  : "bg-[#20242e] text-white border border-[#2d313b]"
+              }`}
+            >
               {totalExercises}
             </span>
           </Link>
 
-          {/* Saved badge = pill with outline/border only, turns green on click/hover */}
+          {/* Saved badge */}
           <Link
             href="/my-plan?tab=saved"
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#2d313b] bg-[#15171d]/60 text-gray-200 text-xs font-bold transition-all duration-200 hover:border-[#c2f800] hover:text-[#c2f800] active:bg-[#c2f800] active:text-[#0f1115] active:border-[#c2f800]"
+            onClick={() => setActiveTab("saved")}
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 ${
+              activeTab === "saved"
+                ? "bg-[#c2f800] text-[#0f1115] shadow-sm shadow-[#c2f800]/25 hover:brightness-110"
+                : "border border-[#2d313b] bg-[#15171d]/60 text-gray-200 hover:border-gray-500 hover:text-white"
+            }`}
             title="View Saved Workouts"
           >
-            <span className="tracking-wide uppercase font-semibold text-gray-300">Saved</span>
-            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-[#20242e] text-white text-xs font-extrabold border border-[#2d313b]">
+            <span
+              className={`tracking-wide uppercase font-semibold ${
+                activeTab === "saved" ? "text-[#0f1115]" : "text-gray-300"
+              }`}
+            >
+              Saved
+            </span>
+            <span
+              className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-xs font-extrabold ${
+                activeTab === "saved"
+                  ? "bg-[#0f1115] text-[#c2f800]"
+                  : "bg-[#20242e] text-white border border-[#2d313b]"
+              }`}
+            >
               {saved.length}
             </span>
           </Link>
@@ -93,20 +127,42 @@ export default function Navbar() {
         <div className="flex sm:hidden items-center gap-2">
           <Link
             href="/my-plan?tab=plan"
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#c2f800] text-[#0f1115] text-xs font-bold"
+            onClick={() => setActiveTab("plan")}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-all ${
+              activeTab === "plan"
+                ? "bg-[#c2f800] text-[#0f1115]"
+                : "border border-[#2d313b] text-gray-300"
+            }`}
           >
             <span>Plan</span>
-            <span className="bg-[#0f1115] text-[#c2f800] px-1.5 py-0.5 rounded-full text-[10px]">
+            <span
+              className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                activeTab === "plan"
+                  ? "bg-[#0f1115] text-[#c2f800]"
+                  : "bg-[#20242e] text-white"
+              }`}
+            >
               {totalExercises}
             </span>
           </Link>
 
           <Link
             href="/my-plan?tab=saved"
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#2d313b] text-gray-300 text-xs font-bold hover:border-[#c2f800] hover:text-[#c2f800] active:bg-[#c2f800] active:text-[#0f1115]"
+            onClick={() => setActiveTab("saved")}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-all ${
+              activeTab === "saved"
+                ? "bg-[#c2f800] text-[#0f1115]"
+                : "border border-[#2d313b] text-gray-300"
+            }`}
           >
             <span>Saved</span>
-            <span className="bg-[#20242e] text-white px-1.5 py-0.5 rounded-full text-[10px]">
+            <span
+              className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                activeTab === "saved"
+                  ? "bg-[#0f1115] text-[#c2f800]"
+                  : "bg-[#20242e] text-white"
+              }`}
+            >
               {saved.length}
             </span>
           </Link>

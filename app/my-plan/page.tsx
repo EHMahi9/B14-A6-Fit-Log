@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, Suspense } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -33,28 +33,29 @@ function PlanContent() {
     plan,
     saved,
     isLoaded,
+    activeTab,
+    setActiveTab,
     markAsDone,
     removeFromPlan,
     removeFromSaved,
     addToPlan,
   } = usePlan();
 
-  const [selectedTab, setSelectedTab] = useState<"plan" | "saved" | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("Duration");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
 
-  // Derive activeTab directly from URL param, manual selection, or data availability
-  const activeTab: "plan" | "saved" = useMemo(() => {
-    if (selectedTab) return selectedTab;
-    if (tabParam === "saved") return "saved";
-    if (tabParam === "plan") return "plan";
-    if (plan.length === 0 && saved.length > 0) return "saved";
-    return "plan";
-  }, [selectedTab, tabParam, plan.length, saved.length]);
+  // Sync activeTab with URL tabParam if present
+  useEffect(() => {
+    if (tabParam === "saved") {
+      setActiveTab("saved");
+    } else if (tabParam === "plan") {
+      setActiveTab("plan");
+    }
+  }, [tabParam, setActiveTab]);
 
   const handleTabChange = (newTab: "plan" | "saved") => {
-    setSelectedTab(newTab);
+    setActiveTab(newTab);
     router.replace(`/my-plan?tab=${newTab}`, { scroll: false });
   };
 
