@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { usePlan } from "@/context/PlanContext";
-import { SortOption, SortDirection, PlannedWorkout, Workout } from "@/types/workout";
+import { SortOption, PlannedWorkout, Workout } from "@/types/workout";
 import {
   Clock,
   Flame,
@@ -20,8 +20,6 @@ import {
   CalendarCheck,
   Plus,
   Bookmark,
-  ArrowDownNarrowWide,
-  ArrowUpNarrowWide,
 } from "lucide-react";
 
 function PlanContent() {
@@ -42,7 +40,6 @@ function PlanContent() {
   } = usePlan();
 
   const [sortBy, setSortBy] = useState<SortOption>("Duration");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
 
   // Sync activeTab with URL tabParam if present
@@ -71,7 +68,7 @@ function PlanContent() {
     0
   );
 
-  // Sorting logic (Challenge C1: Duration, Calories, Rating with Ascending / Descending order)
+  // Sorting logic (Challenge C1: Sort By Duration, Calories, or Rating)
   const sortedItems = useMemo(() => {
     const list = activeTab === "plan" ? [...plan] : [...saved];
 
@@ -83,18 +80,16 @@ function PlanContent() {
       const ratA = a.rating || 0;
       const ratB = b.rating || 0;
 
-      let comparison = 0;
       if (sortBy === "Duration") {
-        comparison = durB - durA; // Descending base
+        return durB - durA; // Longest duration first
       } else if (sortBy === "Calories") {
-        comparison = calB - calA; // Descending base
+        return calB - calA; // Most calories burned first
       } else if (sortBy === "Rating") {
-        comparison = ratB - ratA; // Descending base
+        return ratB - ratA; // Highest rated first
       }
-
-      return sortDirection === "asc" ? -comparison : comparison;
+      return 0;
     });
-  }, [activeTab, plan, saved, sortBy, sortDirection]);
+  }, [activeTab, plan, saved, sortBy]);
 
   if (!isLoaded) {
     return (
@@ -207,8 +202,8 @@ function PlanContent() {
           </button>
         </div>
 
-        {/* Challenge C1: Sort By Criteria & Order Toggle (Ascending & Descending) */}
-        <div className="relative flex items-center gap-2 self-end sm:self-auto flex-wrap">
+        {/* Challenge C1: Sort By Criteria */}
+        <div className="relative flex items-center gap-2 self-end sm:self-auto">
           <span className="text-xs uppercase font-bold tracking-wider text-gray-400 whitespace-nowrap">
             Sort By
           </span>
@@ -234,10 +229,7 @@ function PlanContent() {
                   className="fixed inset-0 z-20"
                   onClick={() => setSortDropdownOpen(false)}
                 />
-                <div className="absolute right-0 mt-1.5 w-52 rounded-xl bg-[#151921] border border-[#232732] shadow-2xl py-1.5 z-30 animate-in fade-in">
-                  <div className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-gray-400">
-                    Sort Criteria
-                  </div>
+                <div className="absolute right-0 mt-1.5 w-44 rounded-xl bg-[#151921] border border-[#232732] shadow-2xl py-1.5 z-30 animate-in fade-in">
                   {(["Duration", "Calories", "Rating"] as SortOption[]).map(
                     (option) => (
                       <button
@@ -259,82 +251,10 @@ function PlanContent() {
                       </button>
                     )
                   )}
-
-                  <div className="my-1.5 border-t border-[#232732]" />
-
-                  <div className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-gray-400">
-                    Order
-                  </div>
-                  <button
-                    onClick={() => {
-                      setSortDirection("desc");
-                      setSortDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-3.5 py-2 text-xs font-semibold flex items-center justify-between transition-colors ${
-                      sortDirection === "desc"
-                        ? "bg-[#1a2312] text-[#c2f800]"
-                        : "text-gray-300 hover:bg-[#1f242d] hover:text-white"
-                    }`}
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <ArrowDownNarrowWide className="w-3.5 h-3.5 text-[#c2f800]" />
-                      Descending (High → Low)
-                    </span>
-                    {sortDirection === "desc" && (
-                      <Check className="w-3.5 h-3.5 text-[#c2f800]" />
-                    )}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSortDirection("asc");
-                      setSortDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-3.5 py-2 text-xs font-semibold flex items-center justify-between transition-colors ${
-                      sortDirection === "asc"
-                        ? "bg-[#1a2312] text-[#c2f800]"
-                        : "text-gray-300 hover:bg-[#1f242d] hover:text-white"
-                    }`}
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <ArrowUpNarrowWide className="w-3.5 h-3.5 text-[#c2f800]" />
-                      Ascending (Low → High)
-                    </span>
-                    {sortDirection === "asc" && (
-                      <Check className="w-3.5 h-3.5 text-[#c2f800]" />
-                    )}
-                  </button>
                 </div>
               </>
             )}
           </div>
-
-          {/* Quick Toggle Button for Ascending / Descending Order */}
-          <button
-            onClick={() =>
-              setSortDirection((prev) => (prev === "desc" ? "asc" : "desc"))
-            }
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#13161d] border border-[#232732] text-xs font-semibold text-gray-200 hover:border-[#c2f800]/50 hover:text-white transition-all focus:outline-none focus:ring-1 focus:ring-[#c2f800] active:scale-95"
-            title={
-              sortDirection === "desc"
-                ? "Descending: High to Low (Click for Ascending: Low to High)"
-                : "Ascending: Low to High (Click for Descending: High to Low)"
-            }
-            aria-label="Toggle ascending and descending order"
-          >
-            {sortDirection === "desc" ? (
-              <>
-                <ArrowDownNarrowWide className="w-3.5 h-3.5 text-[#c2f800]" />
-                <span className="hidden sm:inline">High → Low</span>
-                <span className="sm:hidden">Desc</span>
-              </>
-            ) : (
-              <>
-                <ArrowUpNarrowWide className="w-3.5 h-3.5 text-[#c2f800]" />
-                <span className="hidden sm:inline">Low → High</span>
-                <span className="sm:hidden">Asc</span>
-              </>
-            )}
-          </button>
         </div>
       </div>
 
