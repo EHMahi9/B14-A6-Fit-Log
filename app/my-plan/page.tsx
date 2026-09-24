@@ -40,6 +40,7 @@ function PlanContent() {
   } = usePlan();
 
   const [sortBy, setSortBy] = useState<SortOption>("Duration");
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
 
   // Sync activeTab with URL tabParam if present
@@ -68,7 +69,7 @@ function PlanContent() {
     0
   );
 
-  // Sorting logic (Challenge C1: Sort By Duration, Calories, or Rating)
+  // Sorting logic (Challenge C1: Sort By Duration, Calories, or Rating with Ascending / Descending toggle)
   const sortedItems = useMemo(() => {
     const list = activeTab === "plan" ? [...plan] : [...saved];
 
@@ -80,16 +81,18 @@ function PlanContent() {
       const ratA = a.rating || 0;
       const ratB = b.rating || 0;
 
+      let diff = 0;
       if (sortBy === "Duration") {
-        return durB - durA; // Longest duration first
+        diff = durB - durA; // Default descending (longest first)
       } else if (sortBy === "Calories") {
-        return calB - calA; // Most calories burned first
+        diff = calB - calA; // Default descending (most calories first)
       } else if (sortBy === "Rating") {
-        return ratB - ratA; // Highest rated first
+        diff = ratB - ratA; // Default descending (highest rated first)
       }
-      return 0;
+
+      return sortOrder === "asc" ? -diff : diff;
     });
-  }, [activeTab, plan, saved, sortBy]);
+  }, [activeTab, plan, saved, sortBy, sortOrder]);
 
   if (!isLoaded) {
     return (
@@ -216,6 +219,9 @@ function PlanContent() {
               aria-label="Select sort criteria"
             >
               <span>{sortBy}</span>
+              <span className="text-[11px] font-extrabold text-[#c2f800]">
+                {sortOrder === "desc" ? "↓" : "↑"}
+              </span>
               <ChevronDown
                 className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
                   sortDropdownOpen ? "rotate-180" : ""
@@ -229,27 +235,48 @@ function PlanContent() {
                   className="fixed inset-0 z-20"
                   onClick={() => setSortDropdownOpen(false)}
                 />
-                <div className="absolute right-0 mt-1.5 w-44 rounded-xl bg-[#151921] border border-[#232732] shadow-2xl py-1.5 z-30 animate-in fade-in">
+                <div className="absolute right-0 mt-1.5 w-52 rounded-xl bg-[#151921] border border-[#232732] shadow-2xl py-1.5 z-30 animate-in fade-in">
                   {(["Duration", "Calories", "Rating"] as SortOption[]).map(
-                    (option) => (
-                      <button
-                        key={option}
-                        onClick={() => {
-                          setSortBy(option);
-                          setSortDropdownOpen(false);
-                        }}
-                        className={`w-full text-left px-3.5 py-2 text-xs font-semibold flex items-center justify-between transition-colors ${
-                          sortBy === option
-                            ? "bg-[#1a2312] text-[#c2f800]"
-                            : "text-gray-300 hover:bg-[#1f242d] hover:text-white"
-                        }`}
-                      >
-                        <span>{option}</span>
-                        {sortBy === option && (
-                          <Check className="w-3.5 h-3.5 text-[#c2f800]" />
-                        )}
-                      </button>
-                    )
+                    (option) => {
+                      const isSelected = sortBy === option;
+                      return (
+                        <button
+                          key={option}
+                          onClick={() => {
+                            if (isSelected) {
+                              // If clicked again on the same option, toggle between desc and asc
+                              setSortOrder((prev) =>
+                                prev === "desc" ? "asc" : "desc"
+                              );
+                            } else {
+                              // When choosing a new option, default to descending
+                              setSortBy(option);
+                              setSortOrder("desc");
+                            }
+                            setSortDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-3.5 py-2.5 text-xs font-semibold flex items-center justify-between transition-colors ${
+                            isSelected
+                              ? "bg-[#1a2312] text-[#c2f800]"
+                              : "text-gray-300 hover:bg-[#1f242d] hover:text-white"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span>{option}</span>
+                            {isSelected && (
+                              <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-[#c2f800]/15 text-[#c2f800]">
+                                {sortOrder === "desc"
+                                  ? "High → Low (↓)"
+                                  : "Low → High (↑)"}
+                              </span>
+                            )}
+                          </div>
+                          {isSelected && (
+                            <Check className="w-3.5 h-3.5 text-[#c2f800]" />
+                          )}
+                        </button>
+                      );
+                    }
                   )}
                 </div>
               </>
