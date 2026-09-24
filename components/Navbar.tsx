@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -11,9 +11,18 @@ export default function Navbar() {
   const pathname = usePathname();
   const { totalExercises, saved, activeTab, setActiveTab } = usePlan();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  const isWorkoutActive = pathname === "/" || pathname.startsWith("/workout");
-  const isPlanActive = pathname.startsWith("/my-plan");
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isWorkoutActive = mounted
+    ? pathname === "/" || (pathname ? pathname.startsWith("/workout") : false)
+    : false;
+  const isPlanActive = mounted
+    ? (pathname ? pathname.startsWith("/my-plan") : false)
+    : false;
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#1c1f26] bg-[#0c0d10]/95 backdrop-blur-md">
@@ -39,9 +48,13 @@ export default function Navbar() {
         </Link>
 
         {/* Center: Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1.5 p-1 rounded-full bg-[#15171d] border border-[#222630]">
+        <nav
+          suppressHydrationWarning
+          className="hidden md:flex items-center gap-1.5 p-1 rounded-full bg-[#15171d] border border-[#222630]"
+        >
           <Link
             href="/"
+            suppressHydrationWarning
             className={`px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 ${
               isWorkoutActive
                 ? "bg-[#1a2312] text-[#c2f800] border border-[#2d3a20] shadow-sm shadow-[#c2f800]/10"
@@ -52,6 +65,7 @@ export default function Navbar() {
           </Link>
           <Link
             href="/my-plan"
+            suppressHydrationWarning
             className={`px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 ${
               isPlanActive
                 ? "bg-[#1a2312] text-[#c2f800] border border-[#2d3a20] shadow-sm shadow-[#c2f800]/10"
@@ -63,11 +77,15 @@ export default function Navbar() {
         </nav>
 
         {/* Right: Status Badges (Counters) - Green highlight shifts between Plan and Saved */}
-        <div className="hidden sm:flex items-center gap-3">
+        <div
+          suppressHydrationWarning
+          className="hidden sm:flex items-center gap-3"
+        >
           {/* Plan badge */}
           <Link
             href="/my-plan?tab=plan"
             onClick={() => setActiveTab("plan")}
+            suppressHydrationWarning
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 ${
               activeTab === "plan"
                 ? "bg-[#c2f800] text-[#0f1115] shadow-sm shadow-[#c2f800]/25 hover:brightness-110"
@@ -83,6 +101,7 @@ export default function Navbar() {
               Plan
             </span>
             <span
+              suppressHydrationWarning
               className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-xs font-extrabold ${
                 activeTab === "plan"
                   ? "bg-[#0f1115] text-[#c2f800]"
@@ -97,6 +116,7 @@ export default function Navbar() {
           <Link
             href="/my-plan?tab=saved"
             onClick={() => setActiveTab("saved")}
+            suppressHydrationWarning
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 ${
               activeTab === "saved"
                 ? "bg-[#c2f800] text-[#0f1115] shadow-sm shadow-[#c2f800]/25 hover:brightness-110"
@@ -112,6 +132,7 @@ export default function Navbar() {
               Saved
             </span>
             <span
+              suppressHydrationWarning
               className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-xs font-extrabold ${
                 activeTab === "saved"
                   ? "bg-[#0f1115] text-[#c2f800]"
@@ -124,10 +145,14 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Hamburger Toggle */}
-        <div className="flex sm:hidden items-center gap-2">
+        <div
+          suppressHydrationWarning
+          className="flex sm:hidden items-center gap-2"
+        >
           <Link
             href="/my-plan?tab=plan"
             onClick={() => setActiveTab("plan")}
+            suppressHydrationWarning
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-all ${
               activeTab === "plan"
                 ? "bg-[#c2f800] text-[#0f1115]"
@@ -136,6 +161,7 @@ export default function Navbar() {
           >
             <span>Plan</span>
             <span
+              suppressHydrationWarning
               className={`px-1.5 py-0.5 rounded-full text-[10px] ${
                 activeTab === "plan"
                   ? "bg-[#0f1115] text-[#c2f800]"
@@ -149,6 +175,7 @@ export default function Navbar() {
           <Link
             href="/my-plan?tab=saved"
             onClick={() => setActiveTab("saved")}
+            suppressHydrationWarning
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-all ${
               activeTab === "saved"
                 ? "bg-[#c2f800] text-[#0f1115]"
@@ -157,6 +184,7 @@ export default function Navbar() {
           >
             <span>Saved</span>
             <span
+              suppressHydrationWarning
               className={`px-1.5 py-0.5 rounded-full text-[10px] ${
                 activeTab === "saved"
                   ? "bg-[#0f1115] text-[#c2f800]"
